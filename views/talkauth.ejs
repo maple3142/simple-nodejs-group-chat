@@ -1,0 +1,5 @@
+<title>talkauth: <%= id %></title>
+<form method="post" action="/talk/<%= id %>/auth">
+    <input required type="text" name="secret" placeholder="key">
+    <input required type="submit" name="send" value="auth">
+</form>

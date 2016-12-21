@@ -1,0 +1,13 @@
+<title>talk: <%= id %></title>
+<ul>
+    <% if(msg.length==0){ %><li>no messenge</li><% } %>
+    <% for(i in msg){ %>
+        <li><%=msg[i].text %> -----<%=msg[i].sender %></li>
+    <% } %>
+</ul>
+<form method="post" action="/talk/<%= id %>/new">
+    <input name="id" value="<%=id %>" hidden>
+    <input required name="msg" type="text">
+    <input required type="submit" name="send" value="send">
+</form>
+<a href="/talk/<%= id %>/delete">delete</a>
