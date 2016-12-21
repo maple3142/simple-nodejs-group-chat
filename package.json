@@ -1,0 +1,11 @@
+{
+  "name": "messenger",
+  "version": "1.0.0",
+  "description": "simple web messenger",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "maple3142 <kirby741852963@gmail.com> (http://maple3142.net/)",
+  "license": "ISC"
+}
