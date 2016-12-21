@@ -61,7 +61,8 @@ app.get('/talk/:id/delete',(req,res)=>{
         db.get('list').remove(getid(req.params.id)).value();
         res.redirect('/');
     }
-    res.redirect('/talk/'+req.params.id);
+    else
+        res.redirect('/talk/'+req.params.id);
 });
 
 
