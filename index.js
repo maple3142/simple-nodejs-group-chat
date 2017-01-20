@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json());
 app.use(session({
 	name: 'tmp',
-	secret: 'EE5SwYstbe0ZIv5Zw5kZT6QWsPMEnQ3w0cT7nJK0wCsBriArb06YyTqqnlGu7h27tKN7VjiWiESa6ksLATsdeWUj7xMAzqDmlA7sU4e8tVOO41pgCaPYckJrKT8i5DL4',
+    secret: make(),
 	cookie: { maxAge: 60 * 1000 },
 	resave: true,
 	saveUninitialized: true
@@ -29,30 +29,39 @@ app.post('/new',(req,res)=>{
     res.redirect('../talk/'+now);
 });
 app.get('/talk/:id',(req,res)=>{
-    if(req.session['id'+req.params.id] || !getid(req.params.id).auth){
-        res.render('talk.ejs',{id: req.params.id,msg: (low('./talk/'+req.params.id+'.json').get('msg').value()||[]) });
-    }
-    else{
-        res.render('talkauth.ejs',{id: req.params.id});
-    }
-});
-app.post('/talk/:id/auth',(req,res)=>{
-    var obj=getid(req.params.id);
-    if(obj){
-        if(obj.secret==req.body.secret){
-            req.session['id'+req.params.id]=true;
+    if(getid(req.params.id)){
+        if(req.session['id'+req.params.id] || !getid(req.params.id).auth){
+            res.render('talk.ejs',{id: req.params.id,msg: (low('./talk/'+req.params.id+'.json').get('msg').value()||[]) });
+        }
+        else{
+            res.render('talkauth.ejs',{id: req.params.id});
         }
     }
-    res.redirect('/talk/'+req.params.id);
+    else res.redirect('/');
+});
+app.post('/talk/:id/auth',(req,res)=>{
+    if(getid(req.params.id)){
+        var obj=getid(req.params.id);
+        if(obj){
+            if(obj.secret==req.body.secret){
+                req.session['id'+req.params.id]=true;
+            }
+        }
+        res.redirect('/talk/'+req.params.id);
+    }
+    else res.redirect('/');
 });
 app.post('/talk/:id/new',(req,res)=>{
-    if(req.session['id'+req.params.id] || !getid(req.params.id).auth){
-        var talkdb=low('./talk/'+req.params.id+'.json');
-        if(!talkdb.get('msg').value())
-            talkdb.set('msg',[]).value();
-        talkdb.get('msg').push({text: req.body.msg,sender: req.connection.remoteAddress}).value();
+    if(getid(req.params.id)){
+        if(req.session['id'+req.params.id] || !getid(req.params.id).auth){
+            var talkdb=low('./talk/'+req.params.id+'.json');
+            if(!talkdb.get('msg').value())
+                talkdb.set('msg',[]).value();
+            talkdb.get('msg').push({text: req.body.msg,sender: req.connection.remoteAddress.split(':').pop()}).value();
+        }
+        res.redirect('/talk/'+req.params.id);
     }
-    res.redirect('/talk/'+req.params.id);
+    else res.redirect('/');
 });
 app.get('/talk/:id/delete',(req,res)=>{
     if(req.session['id'+req.params.id] || !getid(req.params.id).auth){
@@ -78,4 +87,7 @@ function getid(id){
         }
     }
     return (exist?list[i]:null);
+}
+function make(){
+    return Math.random().toString(36).substring(7)+Math.random().toString(35).substring(7)+Math.random().toString(34).substring(7)+Math.random().toString(33).substring(7);
 }
